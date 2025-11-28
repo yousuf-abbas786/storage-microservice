@@ -1,6 +1,7 @@
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using StorageService.Application.DTOs;
+using StorageService.Application.Options;
 using StorageService.Application.Repositories;
 using StorageService.Application.Services.Interfaces;
 using StorageService.Application.Specifications;
@@ -15,12 +16,12 @@ namespace StorageService.Application.Services
     public class AuthService : IAuthService
     {
         private readonly IRepository<User> _userRepository;
-        private readonly IConfiguration _configuration;
+        private readonly JwtOptions _jwtOptions;
 
-        public AuthService(IRepository<User> userRepository, IConfiguration configuration)
+        public AuthService(IRepository<User> userRepository, IOptions<JwtOptions> jwtOptions)
         {
             _userRepository = userRepository;
-            _configuration = configuration;
+            _jwtOptions = jwtOptions.Value;
         }
 
         public async Task<LoginResponse?> LoginAsync(string username, string password, string? tenantId, CancellationToken ct = default)
@@ -79,7 +80,7 @@ namespace StorageService.Application.Services
         private string GenerateJwtToken(User user)
         {
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
-                _configuration["Jwt:Key"] ?? throw new InvalidOperationException("JWT Key not configured")));
+                _jwtOptions.Key ?? throw new InvalidOperationException("JWT Key not configured")));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var claims = new[]
@@ -90,8 +91,8 @@ namespace StorageService.Application.Services
             };
 
             var token = new JwtSecurityToken(
-                issuer: _configuration["Jwt:Issuer"],
-                audience: _configuration["Jwt:Audience"],
+                issuer: _jwtOptions.Issuer,
+                audience: _jwtOptions.Audience,
                 claims: claims,
                 expires: DateTime.UtcNow.AddHours(24),
                 signingCredentials: creds);

@@ -1,7 +1,5 @@
-﻿
-
-using Microsoft.Extensions.Configuration;
-
+﻿using Microsoft.Extensions.Options;
+using StorageService.Application.Options;
 using StorageService.Application.Services.Interfaces;
 
 namespace StorageService.Infrastructure
@@ -10,9 +8,9 @@ namespace StorageService.Infrastructure
     {
         private readonly string _rootPath;
 
-        public LocalFileStorageProvider(IConfiguration config)
+        public LocalFileStorageProvider(IOptions<StorageOptions> options)
         {
-            _rootPath = config["Storage:RootPath"]
+            _rootPath = options.Value.RootPath
                         ?? Path.Combine(AppContext.BaseDirectory, "storage");
             Directory.CreateDirectory(_rootPath);
         }

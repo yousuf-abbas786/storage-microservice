@@ -1,9 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using StorageService.API.Configs;
-using StorageService.API.Middleware;
 using StorageService.Infrastructure.Data;
-using StorageService.Infrastructure.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -57,12 +55,11 @@ try
         });
     });
 
+    builder.Services.SetupOptions(builder.Configuration);
     builder.Services.SetupServices();
     builder.Services.SetupProviders(builder.Configuration);
-    builder.Services.AddJwtAuthentication(builder.Configuration);
-    builder.Services.AddAuthorization();
-    builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
-    builder.Services.AddProblemDetails();
+    builder.Services.SetupAuthentication(builder.Configuration);
+    builder.Services.SetupMiddleware();
 
     var app = builder.Build();
 
