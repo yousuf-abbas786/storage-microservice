@@ -42,6 +42,8 @@ namespace StorageService.Infrastructure
 
         public Task<Stream> GetAsync(string container, string fileKey, CancellationToken cancellationToken = default)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             var fullPath = Path.Combine(_rootPath, container,
                 fileKey.Replace('/', Path.DirectorySeparatorChar));
 
@@ -54,6 +56,8 @@ namespace StorageService.Infrastructure
 
         public Task<bool> DeleteAsync(string container, string fileKey, CancellationToken cancellationToken = default)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             var fullPath = Path.Combine(_rootPath, container,
                 fileKey.Replace('/', Path.DirectorySeparatorChar));
 
@@ -66,6 +70,8 @@ namespace StorageService.Infrastructure
 
         public Task<bool> ExistsAsync(string container, string fileKey, CancellationToken cancellationToken = default)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             var fullPath = Path.Combine(_rootPath, container,
                 fileKey.Replace('/', Path.DirectorySeparatorChar));
             return Task.FromResult(File.Exists(fullPath));

@@ -16,9 +16,25 @@ namespace StorageService.Infrastructure.Extensions
 {
     public static class IServiceCollectionExtensions
     {
-        public static IServiceCollection AddStorageProviders(this IServiceCollection services)
+        public static IServiceCollection AddStorageProviders(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddSingleton<IFileStorageProvider, LocalFileStorageProvider>();
+            var storageOptions = configuration.GetSection(StorageOptions.SectionName)
+                .Get<StorageOptions>()
+                ?? throw new InvalidOperationException("Storage configuration not found.");
+
+            var provider = storageOptions.Provider?.Trim() ?? "Local";
+
+            switch (provider.ToLowerInvariant())
+            {
+                case "local":
+                    services.AddSingleton<IFileStorageProvider, LocalFileStorageProvider>();
+                    break;
+
+                default:
+                    throw new InvalidOperationException(
+                        $"Unknown storage provider: {provider}. Supported: Local");
+            }
+
             return services;
         }
 

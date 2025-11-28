@@ -6,7 +6,7 @@ namespace StorageService.API.Configs
     {
         public static void SetupProviders(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddStorageProviders();
+            services.AddStorageProviders(configuration);
             services.AddDataAccess(configuration);
         }
     }

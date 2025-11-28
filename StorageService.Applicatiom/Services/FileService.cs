@@ -95,6 +95,8 @@ namespace StorageService.Application.Services
             var items = await _repository.GetAsync(spec, ct);
             var totalCount = await _repository.CountAsync(spec, ct);
 
+            ct.ThrowIfCancellationRequested();
+
             var fileItems = items.Select(f => new FileListItem
             {
                 Id = f.Id,
@@ -121,6 +123,8 @@ namespace StorageService.Application.Services
             var spec = new SearchFilesByNameSpecification(fileName, request.Skip, request.Take);
             var items = await _repository.GetAsync(spec, ct);
             var totalCount = await _repository.CountAsync(spec, ct);
+
+            ct.ThrowIfCancellationRequested();
 
             var fileItems = items.Select(f => new FileListItem
             {

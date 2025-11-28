@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using StorageService.Application.Repositories;
 using StorageService.Application.Specifications;
 using StorageService.Domain.Entities;
@@ -15,6 +16,7 @@ namespace StorageService.Infrastructure.Repositories
         {
             var spec = new GetFileByIdSpecification(id);
             var results = await GetAsync(spec, ct);
+            ct.ThrowIfCancellationRequested();
             return results.FirstOrDefault();
         }
     }

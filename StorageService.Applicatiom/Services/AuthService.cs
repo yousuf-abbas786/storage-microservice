@@ -28,6 +28,7 @@ namespace StorageService.Application.Services
         {
             var spec = new GetUserByUsernameAndTenantSpecification(username, tenantId);
             var users = await _userRepository.GetAsync(spec, ct);
+            ct.ThrowIfCancellationRequested();
             var user = users.FirstOrDefault();
 
             if (user == null)
@@ -52,6 +53,7 @@ namespace StorageService.Application.Services
         {
             var existingSpec = new GetUserByUsernameAndTenantSpecification(request.Username, request.TenantId);
             var existing = await _userRepository.GetAsync(existingSpec, ct);
+            ct.ThrowIfCancellationRequested();
 
             if (existing.Any())
                 throw new InvalidOperationException($"Username '{request.Username}' already exists for tenant '{request.TenantId}'");
