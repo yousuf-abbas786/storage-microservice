@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Asp.Versioning;
+
+using Microsoft.AspNetCore.Mvc;
 using StorageService.API.Configs;
 using StorageService.API.Configs.Results;
 using StorageService.API.Models;
@@ -9,6 +11,11 @@ namespace StorageService.API.Endpoints
 {
     public class Files : EndpointGroupBase
     {
+        public Files()
+        {
+            Version = new ApiVersion(1, 0);
+        }
+
         public override void Map(WebApplication app)
         {
             var group = app.MapGroup(this);
