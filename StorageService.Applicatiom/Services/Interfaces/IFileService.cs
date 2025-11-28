@@ -1,11 +1,5 @@
 ﻿using StorageService.Application.DTOs;
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace StorageService.Application.Services.Interfaces
 {
     public interface IFileService
@@ -20,5 +14,7 @@ namespace StorageService.Application.Services.Interfaces
 
         Task<DownloadFileResult?> DownloadAsync(Guid id, CancellationToken ct = default);
         Task<bool> DeleteAsync(Guid id, CancellationToken ct = default);
+        Task<PagedResult<FileListItem>> GetFilesAsync(PaginationRequest request, CancellationToken ct = default);
+        Task<PagedResult<FileListItem>> SearchFilesAsync(string fileName, PaginationRequest request, CancellationToken ct = default);
     }
 }

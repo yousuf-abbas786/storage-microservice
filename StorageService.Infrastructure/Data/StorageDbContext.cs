@@ -30,6 +30,7 @@ namespace StorageService.Infrastructure.Data
                 entity.HasIndex(e => e.Id);
                 entity.HasIndex(e => new { e.TenantId, e.DeletedAt });
                 entity.HasIndex(e => new { e.OwnerId, e.DeletedAt });
+                entity.HasIndex(e => new { e.FileName, e.DeletedAt });
             });
         }
     }

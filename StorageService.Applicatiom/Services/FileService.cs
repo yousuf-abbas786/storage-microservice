@@ -1,6 +1,7 @@
 ﻿using StorageService.Application.DTOs;
 using StorageService.Application.Repositories;
 using StorageService.Application.Services.Interfaces;
+using StorageService.Application.Specifications;
 using StorageService.Domain.Entities;
 
 namespace StorageService.Application.Services
@@ -86,6 +87,60 @@ namespace StorageService.Application.Services
             file.DeletedAt = DateTimeOffset.UtcNow;
             await _repository.SaveChangesAsync(ct);
             return true;
+        }
+
+        public async Task<PagedResult<FileListItem>> GetFilesAsync(PaginationRequest request, CancellationToken ct = default)
+        {
+            var spec = new GetAllFilesSpecification(request.Skip, request.Take);
+            var items = await _repository.GetAsync(spec, ct);
+            var totalCount = await _repository.CountAsync(spec, ct);
+
+            var fileItems = items.Select(f => new FileListItem
+            {
+                Id = f.Id,
+                FileName = f.FileName,
+                ContentType = f.ContentType,
+                Size = f.Size,
+                Container = f.Container,
+                OwnerId = f.OwnerId,
+                TenantId = f.TenantId,
+                CreatedAt = f.CreatedAt
+            }).ToList();
+
+            return new PagedResult<FileListItem>
+            {
+                Items = fileItems,
+                TotalCount = totalCount,
+                PageNumber = request.PageNumber,
+                PageSize = request.PageSize
+            };
+        }
+
+        public async Task<PagedResult<FileListItem>> SearchFilesAsync(string fileName, PaginationRequest request, CancellationToken ct = default)
+        {
+            var spec = new SearchFilesByNameSpecification(fileName, request.Skip, request.Take);
+            var items = await _repository.GetAsync(spec, ct);
+            var totalCount = await _repository.CountAsync(spec, ct);
+
+            var fileItems = items.Select(f => new FileListItem
+            {
+                Id = f.Id,
+                FileName = f.FileName,
+                ContentType = f.ContentType,
+                Size = f.Size,
+                Container = f.Container,
+                OwnerId = f.OwnerId,
+                TenantId = f.TenantId,
+                CreatedAt = f.CreatedAt
+            }).ToList();
+
+            return new PagedResult<FileListItem>
+            {
+                Items = fileItems,
+                TotalCount = totalCount,
+                PageNumber = request.PageNumber,
+                PageSize = request.PageSize
+            };
         }
     }
 }

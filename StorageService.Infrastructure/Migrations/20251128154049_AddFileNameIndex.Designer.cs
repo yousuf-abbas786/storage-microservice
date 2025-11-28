@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using StorageService.Infrastructure.Data;
 
@@ -11,9 +12,11 @@ using StorageService.Infrastructure.Data;
 namespace StorageService.Infrastructure.Migrations
 {
     [DbContext(typeof(StorageDbContext))]
-    partial class StorageDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251128154049_AddFileNameIndex")]
+    partial class AddFileNameIndex
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

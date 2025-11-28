@@ -22,6 +22,16 @@ namespace StorageService.API.Endpoints
                  .Produces<UploadFileResponse>(StatusCodes.Status201Created)
                  .ProducesProblem(StatusCodes.Status400BadRequest);
 
+            // GET /api/files -> get paginated list of files (must be before /{id} route)
+            group.MapGet("/", GetFilesAsync)
+                 .WithName("GetFiles")
+                 .Produces<PagedResult<FileListItem>>(StatusCodes.Status200OK);
+
+            // GET /api/files/search?fileName=... -> search files by name
+            group.MapGet("/search", SearchFilesAsync)
+                 .WithName("SearchFiles")
+                 .Produces<PagedResult<FileListItem>>(StatusCodes.Status200OK);
+
             // GET /api/files/{id}  -> download a file
             group.MapGet("/{id:guid}", DownloadFileAsync)
                  .WithName("DownloadFile")
@@ -33,14 +43,9 @@ namespace StorageService.API.Endpoints
                  .WithName("DeleteFile")
                  .Produces(StatusCodes.Status204NoContent)
                  .ProducesProblem(StatusCodes.Status404NotFound);
-
-
         }
 
-        private static async Task<IResult> UploadFileAsync(
-            [FromForm] UploadFileRequest request,
-            [FromServices] IFileService fileService,
-            CancellationToken ct)
+        private static async Task<IResult> UploadFileAsync([FromForm] UploadFileRequest request, [FromServices] IFileService fileService, CancellationToken ct)
         {
             if (request?.File is null || request.File.Length == 0)
                 return Results.BadRequest("File is required.");
@@ -76,6 +81,34 @@ namespace StorageService.API.Endpoints
                 return Results.Extensions.APIResult_NotFound("File not found");
 
             return Results.Extensions.APIResult_NoContent();
+        }
+
+        private static async Task<IResult> GetFilesAsync([FromServices] IFileService fileService, int pageNumber = 1, int pageSize = 10, CancellationToken ct = default)
+        {
+            var request = new PaginationRequest
+            {
+                PageNumber = pageNumber,
+                PageSize = pageSize
+            };
+
+            var result = await fileService.GetFilesAsync(request, ct);
+            return Results.Ok(result);
+        }
+
+        private static async Task<IResult> SearchFilesAsync([FromQuery] string fileName, [FromServices] IFileService fileService, int pageNumber = 1, int pageSize = 10,
+            CancellationToken ct = default)
+        {
+            if (string.IsNullOrWhiteSpace(fileName))
+                return Results.BadRequest("File name search term is required.");
+
+            var request = new PaginationRequest
+            {
+                PageNumber = pageNumber,
+                PageSize = pageSize
+            };
+
+            var result = await fileService.SearchFilesAsync(fileName, request, ct);
+            return Results.Ok(result);
         }
     }
 }
