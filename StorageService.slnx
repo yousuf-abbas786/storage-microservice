@@ -1,0 +1,9 @@
+<Solution>
+  <Project Path="StorageService.API/StorageService.API.csproj" />
+  <Project Path="StorageService.Applicatiom/StorageService.Application.csproj" />
+  <Project Path="StorageService.Domain/StorageService.Domain.csproj" />
+  <Project Path="StorageService.Infrastructure/StorageService.Infrastructure.csproj" />
+  <Project Path="docker-compose.dcproj">
+    <Build />
+  </Project>
+</Solution>
