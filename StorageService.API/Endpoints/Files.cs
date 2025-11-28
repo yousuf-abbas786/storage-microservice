@@ -19,30 +19,40 @@ namespace StorageService.API.Endpoints
                  .WithName("UploadFile")
                  .DisableAntiforgery()
                  .Accepts<UploadFileRequest>("multipart/form-data")
+                 .RequireAuthorization()
                  .Produces<UploadFileResponse>(StatusCodes.Status201Created)
-                 .ProducesProblem(StatusCodes.Status400BadRequest);
+                 .ProducesProblem(StatusCodes.Status400BadRequest)
+                 .ProducesProblem(StatusCodes.Status401Unauthorized);
 
             // GET /api/files -> get paginated list of files (must be before /{id} route)
             group.MapGet("/", GetFilesAsync)
                  .WithName("GetFiles")
-                 .Produces<PagedResult<FileListItem>>(StatusCodes.Status200OK);
+                 .RequireAuthorization()
+                 .Produces<PagedResult<FileListItem>>(StatusCodes.Status200OK)
+                 .ProducesProblem(StatusCodes.Status401Unauthorized);
 
             // GET /api/files/search?fileName=... -> search files by name
             group.MapGet("/search", SearchFilesAsync)
                  .WithName("SearchFiles")
-                 .Produces<PagedResult<FileListItem>>(StatusCodes.Status200OK);
+                 .RequireAuthorization()
+                 .Produces<PagedResult<FileListItem>>(StatusCodes.Status200OK)
+                 .ProducesProblem(StatusCodes.Status401Unauthorized);
 
             // GET /api/files/{id}  -> download a file
             group.MapGet("/{id:guid}", DownloadFileAsync)
                  .WithName("DownloadFile")
+                 .RequireAuthorization()
                  .Produces(StatusCodes.Status200OK)
-                 .ProducesProblem(StatusCodes.Status404NotFound);
+                 .ProducesProblem(StatusCodes.Status404NotFound)
+                 .ProducesProblem(StatusCodes.Status401Unauthorized);
 
             // DELETE /api/files/{id} -> delete a file
             group.MapDelete("/{id:guid}", DeleteFileAsync)
                  .WithName("DeleteFile")
+                 .RequireAuthorization()
                  .Produces(StatusCodes.Status204NoContent)
-                 .ProducesProblem(StatusCodes.Status404NotFound);
+                 .ProducesProblem(StatusCodes.Status404NotFound)
+                 .ProducesProblem(StatusCodes.Status401Unauthorized);
         }
 
         private static async Task<IResult> UploadFileAsync([FromForm] UploadFileRequest request, [FromServices] IFileService fileService, CancellationToken ct)

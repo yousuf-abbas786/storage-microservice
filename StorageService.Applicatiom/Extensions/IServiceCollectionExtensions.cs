@@ -9,6 +9,7 @@ namespace StorageService.Application.Extensions
         public static IServiceCollection AddServices(this IServiceCollection services)
         {
             services.AddScoped<IFileService, FileService>();
+            services.AddScoped<IAuthService, AuthService>();
             return services;
         }
     }
