@@ -1,8 +1,6 @@
 using Asp.Versioning.ApiExplorer;
-using Microsoft.EntityFrameworkCore;
 using Serilog;
 using StorageService.API.Configs;
-using StorageService.Infrastructure.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,11 +24,7 @@ try
 
     var app = builder.Build();
 
-    using (var scope = app.Services.CreateScope())
-    {
-        var db = scope.ServiceProvider.GetRequiredService<StorageDbContext>();
-        db.Database.Migrate();
-    }
+    await app.SetupDatabaseAsync();
 
     app.UseExceptionHandler();
 

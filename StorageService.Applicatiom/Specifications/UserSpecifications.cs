@@ -17,5 +17,13 @@ namespace StorageService.Application.Specifications
             Criteria = u => u.Email == email;
         }
     }
+
+    public class GetAllUsersSpecification : BaseSpecification<User>
+    {
+        public GetAllUsersSpecification()
+        {
+            Criteria = u => true;
+        }
+    }
 }
 
