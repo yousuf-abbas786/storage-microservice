@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using Asp.Versioning;
+using System.Reflection;
 
 namespace StorageService.API.Configs
 {
@@ -7,11 +8,16 @@ namespace StorageService.API.Configs
         public static RouteGroupBuilder MapGroup(this WebApplication app, EndpointGroupBase group)
         {
             var groupName = group.GetType().Name;
+            var version = group.Version;
+            var versionString = $"v{version.MajorVersion}";
 
             return app
-                .MapGroup($"/api/{groupName}")
-                .WithGroupName("v1")
-                .WithTags(groupName)
+                .MapGroup($"/api/v{version.MajorVersion}/{groupName}")
+                .WithApiVersionSet(app.NewApiVersionSet()
+                    .HasApiVersion(version)
+                    .Build())
+                .WithGroupName(versionString)
+                .WithTags($"{groupName} - {versionString}")
                 .WithOpenApi();
         }
 

@@ -52,7 +52,7 @@ namespace StorageService.API.Endpoints
             try
             {
                 var result = await authService.RegisterAsync(request, ct);
-                return Results.Extensions.APIResult_Created($"/api/Auth/login", result);
+                return Results.Extensions.APIResult_Created($"/api/v1/Auth/login", result);
             }
             catch (InvalidOperationException ex)
             {

@@ -70,7 +70,7 @@ namespace StorageService.API.Endpoints
                 request.TenantId,
                 ct);
 
-            return Results.Extensions.APIResult_Created($"/api/files/{uploadResult.Id}", uploadResult);
+            return Results.Extensions.APIResult_Created($"/api/v1/Files/{uploadResult.Id}", uploadResult);
         }
 
         private static async Task<IResult> DownloadFileAsync(Guid id, [FromServices] IFileService fileService, CancellationToken ct)

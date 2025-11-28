@@ -1,3 +1,4 @@
+using Asp.Versioning.ApiExplorer;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using StorageService.API.Configs;
@@ -15,46 +16,8 @@ try
 {
     Log.Information("Starting Storage Service API");
 
-    builder.Services.AddEndpointsApiExplorer();
-    builder.Services.AddSwaggerGen(c =>
-    {
-        c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
-        {
-            Title = "Storage Service API",
-            Version = "v1"
-        });
-        
-        c.MapType<IFormFile>(() => new Microsoft.OpenApi.Models.OpenApiSchema
-        {
-            Type = "string",
-            Format = "binary"
-        });
-
-        c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
-        {
-            Description = "JWT Authorization header using the Bearer scheme. Enter 'Bearer' [space] and then your token",
-            Name = "Authorization",
-            In = Microsoft.OpenApi.Models.ParameterLocation.Header,
-            Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey,
-            Scheme = "Bearer"
-        });
-
-        c.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
-        {
-            {
-                new Microsoft.OpenApi.Models.OpenApiSecurityScheme
-                {
-                    Reference = new Microsoft.OpenApi.Models.OpenApiReference
-                    {
-                        Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
-                        Id = "Bearer"
-                    }
-                },
-                Array.Empty<string>()
-            }
-        });
-    });
-
+    builder.Services.SetupVersioning();
+    builder.Services.SetupSwagger();
     builder.Services.SetupOptions(builder.Configuration);
     builder.Services.SetupServices();
     builder.Services.SetupProviders(builder.Configuration);
@@ -77,7 +40,17 @@ try
     if (app.Environment.IsDevelopment())
     {
         app.UseSwagger();
-        app.UseSwaggerUI();
+        app.UseSwaggerUI(options =>
+        {
+            var apiVersionDescriptionProvider = app.Services.GetRequiredService<IApiVersionDescriptionProvider>();
+            
+            foreach (var description in apiVersionDescriptionProvider.ApiVersionDescriptions)
+            {
+                options.SwaggerEndpoint(
+                    $"/swagger/{description.GroupName}/swagger.json",
+                    $"Storage Service API {description.GroupName.ToUpperInvariant()}");
+            }
+        });
     }
 
     app.MapEndpoints();
