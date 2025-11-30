@@ -31,6 +31,8 @@ Clean Architecture with clear separation of concerns:
 
 ### Docker Deployment
 
+#### Local Development
+
 Build and run with Docker Compose:
 ```bash
 docker compose up --build
@@ -41,6 +43,36 @@ The service will:
 - Run database migrations automatically
 - Expose API on http://localhost:8080
 - Swagger UI available at http://localhost:8080/swagger
+
+#### Production Deployment on Separate Machine
+
+For deploying on a separate machine, see **[DEPLOYMENT.md](DEPLOYMENT.md)** for detailed instructions.
+
+**Quick Start:**
+```bash
+# 1. Transfer project files to target machine
+# 2. On target machine, navigate to project directory
+cd StorageService
+
+# 3. Build and start services
+docker compose up -d --build
+
+# 4. Check status
+docker compose ps
+
+# 5. View logs
+docker compose logs -f
+
+# 6. Access API
+# http://<target-machine-ip>:8080/swagger
+```
+
+**For production use:**
+```bash
+# Create .env file with secure passwords
+# Then run with production config
+docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+```
 
 ## API Endpoints
 

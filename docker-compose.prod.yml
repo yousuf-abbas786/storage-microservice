@@ -1,0 +1,56 @@
+version: '3.8'
+
+# Production override file
+# Use with: docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+
+services:
+  sqlserver:
+    environment:
+      - SA_PASSWORD=${SA_PASSWORD:-ChangeMe123!}
+    # Comment out port mapping for security (only accessible within Docker network)
+    # ports:
+    #   - "1433:1433"
+    restart: always
+    # Add resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+        reservations:
+          cpus: '1'
+          memory: 1G
+
+  storage-api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__DefaultConnection=Server=sqlserver,1433;Database=StorageService;User Id=sa;Password=${SA_PASSWORD:-ChangeMe123!};TrustServerCertificate=True;MultipleActiveResultSets=True;
+      - Jwt__Key=${JWT_KEY:-YourSuperSecretKeyThatIsAtLeast32CharactersLong!}
+      - Jwt__Issuer=${JWT_ISSUER:-StorageService}
+      - Jwt__Audience=${JWT_AUDIENCE:-StorageService}
+      - Storage__Provider=Local
+      - Storage__RootPath=/app/storage
+    restart: always
+    # Add health check
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8080/swagger/index.html", "||", "exit", "1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    # Add resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+
+volumes:
+  sqlserver-data:
+    driver: local
+  storage-data:
+    driver: local
+
