@@ -2,86 +2,113 @@
 
 A microservice for centralized file storage with support for local and cloud storage providers.
 
-## Architecture
+## Prerequisites
 
-Clean Architecture with clear separation of concerns:
-- **API**: Presentation layer with minimal endpoints
-- **Application**: Business logic and use cases
-- **Domain**: Core entities and business rules
-- **Infrastructure**: Data access, storage providers, external services
+- Docker Desktop installed and running
+- Git (for cloning the repository)
 
-## Getting Started
+## Quick Start
 
-### Prerequisites
-- .NET 8.0 SDK
-- Docker Desktop (for containerized deployment)
-- SQL Server (or use Docker container)
+### 1. Clone the Repository
 
-### Local Development
-
-1. Update connection string in `appsettings.Development.json`
-2. Create initial migration:
-   ```bash
-   dotnet ef migrations add InitialCreate --project StorageService.Infrastructure --startup-project StorageService.API
-   ```
-3. Run the application:
-   ```bash
-   dotnet run --project StorageService.API
-   ```
-
-### Docker Deployment
-
-#### Local Development
-
-Build and run with Docker Compose:
 ```bash
-docker compose up --build
+git clone <your-repository-url>
+cd StorageService
 ```
 
-The service will:
-- Start SQL Server container
-- Run database migrations automatically
-- Expose API on http://localhost:8080
-- Swagger UI available at http://localhost:8080/swagger
+### 2. Start the Services
 
-#### Production Deployment on Separate Machine
-
-For deploying on a separate machine, see **[DEPLOYMENT.md](DEPLOYMENT.md)** for detailed instructions.
-
-**Quick Start:**
 ```bash
-# 1. Transfer project files to target machine
-# 2. On target machine, navigate to project directory
-cd StorageService
-
-# 3. Build and start services
 docker compose up -d --build
+```
 
-# 4. Check status
+This command will:
+- Download required Docker images (first time only)
+- Build the application
+- Start SQL Server container
+- Start the API container
+- Run database migrations automatically
+- Create default admin user
+
+### 3. Access the API
+
+Open your browser and navigate to:
+- **Swagger UI**: http://localhost:8080/swagger
+- **API Base URL**: http://localhost:8080/api/v1
+
+### 4. Default Credentials
+
+- **Username**: `admin`
+- **Password**: `123`
+- **Tenant**: `yousuf`
+
+## Deployment on Separate Machine
+
+### Step 1: Clone on Target Machine
+
+```bash
+git clone <your-repository-url>
+cd StorageService
+```
+
+### Step 2: Start Services
+
+```bash
+docker compose up -d --build
+```
+
+### Step 3: Verify Deployment
+
+```bash
+# Check container status
 docker compose ps
 
-# 5. View logs
+# View logs
 docker compose logs -f
-
-# 6. Access API
-# http://<target-machine-ip>:8080/swagger
 ```
 
-**For production use:**
+### Step 4: Access from Remote
+
+1. Ensure port 8080 is open in firewall
+2. Access via: `http://<target-machine-ip>:8080/swagger`
+
+## Useful Commands
+
 ```bash
-# Create .env file with secure passwords
-# Then run with production config
-docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+# View logs
+docker compose logs -f
+
+# Stop services
+docker compose down
+
+# Restart services
+docker compose restart
+
+# Rebuild and restart
+docker compose up -d --build
 ```
 
 ## API Endpoints
 
-- `POST /api/Files` - Upload a file
-- `GET /api/Files/{id}` - Download a file
-- `DELETE /api/Files/{id}` - Delete a file
+- `POST /api/v1/Auth/register` - Register new user
+- `POST /api/v1/Auth/login` - Login and get JWT token
+- `POST /api/v1/Files` - Upload a file
+- `GET /api/v1/Files` - List all files (paginated)
+- `GET /api/v1/Files/search?fileName=...` - Search files by name
+- `GET /api/v1/Files/{id}` - Download a file
+- `DELETE /api/v1/Files/{id}` - Delete a file
 
-## Configuration
+## Troubleshooting
 
-- `ConnectionStrings:DefaultConnection` - SQL Server connection string
-- `Storage:RootPath` - Local file storage root path
+**Containers won't start:**
+- Ensure Docker Desktop is running
+- Check logs: `docker compose logs`
 
+**Port already in use:**
+- Change port in `docker-compose.yml` or stop conflicting service
+
+**SQL Server unhealthy:**
+- Wait a minute for SQL Server to fully start
+- Check logs: `docker compose logs sqlserver`
+
+For more details, see [DEPLOYMENT.md](DEPLOYMENT.md) and [TROUBLESHOOTING.md](TROUBLESHOOTING.md).
